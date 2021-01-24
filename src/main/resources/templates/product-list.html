@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Product list</title>
+</head>
+<body>
+<div class="container">
+    <h3>Product directory</h3>
+    <hr>
+
+    <table class="table table-bordered table -striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Add to cart</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="tempProduct:${products}">
+
+            <td th:text="${tempProduct.name}" />
+
+            <td th:text="${tempProduct.desc}" />
+            <td th:text="${tempProduct.category}" />
+            <td th:text="${tempProduct.price}" />
+
+            <!-- add purchase button -->
+            <td>
+                <a th:href="@{/cart/add(productId=${tempProduct.id})}"
+                   class="btn btn-info btn-sm">
+                    Add to cart
+                </a>
+            </td>
+        </tr>
+        </tbody>
+
+    </table>
+</div>
+</body>
+</html>

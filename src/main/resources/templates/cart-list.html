@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <meta charset="UTF-8">
+
+    <title>My shopping cart</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+<body>
+<!--
+<button id="myBtn" onclick="javascript:alert('Hello World!')">Button</button>
+-->
+<h2>My shopping cart</h2>
+<hr>
+
+<div class="container">
+
+    <table class="table table-bordered table -striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Name</th>
+            <th>Desc</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="tempItem:${theCart.items}">
+
+
+
+            <td th:text="${tempItem.value.product.name}"/>
+            <td th:text="${tempItem.value.product.desc}"/>
+            <td th:text="${tempItem.value.product.price}"/>
+            <td>
+                <input id="modifyId" type="hidden" th:value="${tempItem.value.product.id}"/>
+                <input id="inputQuantity" type="text" th:value="${tempItem.value.quantity}"/>
+            </td>
+            <td th:text="${tempItem.value.itemPrice}"/>
+            <!-- add delete button -->
+            <td>
+                <a th:href="@{/cart/delete(productId=${tempItem.value.product.id})}"
+                   class="btn-danger btn-sm">
+                    Delete
+                </a>
+            </td>
+        </tr>
+
+        </tbody>
+
+    </table>
+</div>
+
+<hr>
+
+<p th:text="'Total Price is: ' + ${theCart.totalPrice}"/>
+<br>
+<a th:href="@{/cart/clear}" class="btn btn-secondary">Clear the cart</a>
+&nbsp;&nbsp;
+<a th:href="@{/product/list}" class="btn btn-success">Back to product list</a>
+
+
+
+<script th:inline="javascript" >
+    var input = document.getElementById("inputQuantity");
+    var input2 = document.getElementById("modifyId");
+    input.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+        event.preventDefault();
+        var quantity = input.value;
+        var productId= input2.value;
+
+        var loginData = {
+            productId : input2.value,
+            quantity : input.value
+        }
+
+        var myUrl="http://localhost:8080/cart/modify-amount?productId="+productId+"&quantity="+quantity
+
+         $.ajax({
+            type : "GET",
+            url : myUrl,
+
+            success : function() {
+                console.log("SUCCESS: ");
+                //alert(response);
+            },
+            error : function(e) {
+                console.log("ERROR: ", e);
+                display(e);
+            },
+            done : function(e) {
+                console.log("DONE");
+            }
+        });
+
+        //alert("Enter was pressed was presses:"+myUrl);
+
+    }
+    });
+</script>
+</body>
+</html>

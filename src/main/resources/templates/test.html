@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h3>Trigger Button Click on Enter</h3>
+<p>Press the "Enter" key inside the input field to trigger the button.</p>
+
+<input id="myInput" value="Some text..">
+<button id="myBtn" onclick="javascript:alert('Hello World!')">Button</button>
+
+<script>
+var input = document.getElementById("myInput");
+input.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   document.getElementById("myBtn").click();
+  }
+});
+</script>
+
+</body>
+</html>
