@@ -37,10 +37,23 @@
 
             <!-- add purchase button -->
             <td>
+                <!--
                 <a th:href="@{/cart/add(productId=${tempProduct.id})}"
-                   class="btn btn-info btn-sm">
+                   class="btn btn-info btn-sm" >
                     Add to cart
                 </a>
+                -->
+                <form  action="#" th:action="@{/cart/add}"
+                       th:object="${tempProduct.id}" method="POST">
+                    <input type="hidden" th:value="${tempProduct.id}" name="productId"/>
+
+                <button class="btn btn-info btn-sm" type="submit">
+                    Add to cart
+                </button>
+                </form>
+
+
+
             </td>
         </tr>
         </tbody>

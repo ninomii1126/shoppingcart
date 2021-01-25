@@ -20,6 +20,7 @@ public class Cart {
 
         if(items.containsKey(productId)){
             items.get(productId).addAmount(1);
+            items.get(productId).setItemPrice((product.getPrice())*items.get(productId).getQuantity());
         }else{
             CartItem cartItem = new CartItem(product,1);
             items.put(productId,cartItem);
@@ -56,6 +57,7 @@ public class Cart {
         CartItem cartItem = items.get(product.getId());
         cartItem.setQuantity(newQuantity);
         cartItem.setItemPrice((product.getPrice())*newQuantity);
+        totalPrice=getTotalPrice();
 
         items.replace(product.getId(), cartItem);
     }

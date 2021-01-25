@@ -19,7 +19,7 @@ public class CartItem {
 
     public CartItem(Product product, double itemPrice, int quantity) {
         this.product = product;
-        this.itemPrice = itemPrice;
+        this.itemPrice = product.getPrice()*quantity;
         this.quantity = quantity;
     }
 
@@ -40,7 +40,7 @@ public class CartItem {
     }
 
     public double getItemPrice() {
-        return itemPrice*quantity;
+        return itemPrice;
     }
 
     public void setItemPrice(double thePrice) {

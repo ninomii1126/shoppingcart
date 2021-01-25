@@ -40,8 +40,6 @@
 
         <tr th:each="tempItem:${theCart.items}">
 
-
-
             <td th:text="${tempItem.value.product.name}"/>
             <td th:text="${tempItem.value.product.desc}"/>
             <td th:text="${tempItem.value.product.price}"/>
@@ -74,6 +72,7 @@
 
 
 
+
 <script th:inline="javascript" >
     var input = document.getElementById("inputQuantity");
     var input2 = document.getElementById("modifyId");
@@ -88,29 +87,32 @@
             quantity : input.value
         }
 
-        var myUrl="http://localhost:8080/cart/modify-amount?productId="+productId+"&quantity="+quantity
+        //var myUrl="http://localhost:8080/cart/modify-amount?productId="+productId+"&quantity="+quantity
+        var myUrl="http://localhost:8080/cart/modify-amount"
 
-         $.ajax({
-            type : "GET",
-            url : myUrl,
-
+        $.ajax({
+            url: myUrl,
+            method:"post",
+            data: {"productId":productId, "quantity":quantity},
             success : function() {
                 console.log("SUCCESS: ");
                 //alert(response);
+                //window.location.reload(true);
+                window.location.href = window.location.href;
             },
             error : function(e) {
                 console.log("ERROR: ", e);
-                display(e);
+                //display(e);
             },
             done : function(e) {
                 console.log("DONE");
             }
         });
 
+    }});
+
         //alert("Enter was pressed was presses:"+myUrl);
 
-    }
-    });
 </script>
 </body>
 </html>
