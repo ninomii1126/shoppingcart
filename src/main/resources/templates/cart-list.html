@@ -44,8 +44,12 @@
             <td th:text="${tempItem.value.product.desc}"/>
             <td th:text="${tempItem.value.product.price}"/>
             <td>
+                <!--
                 <input id="modifyId" type="hidden" th:value="${tempItem.value.product.id}"/>
-                <input id="inputQuantity" type="text" th:value="${tempItem.value.quantity}"/>
+                -->
+                <input th:id="${tempItem.value.product.id}" type="text" th:value="${tempItem.value.quantity}"
+                       onkeydown="handle(event)"/>
+
             </td>
             <td th:text="${tempItem.value.itemPrice}"/>
             <!-- add delete button -->
@@ -74,45 +78,34 @@
 
 
 <script th:inline="javascript" >
-    var input = document.getElementById("inputQuantity");
-    var input2 = document.getElementById("modifyId");
-    input.addEventListener("keyup", function(event) {
+    function handle(event) {
         if (event.keyCode === 13) {
-        event.preventDefault();
-        var quantity = input.value;
-        var productId= input2.value;
+            event.preventDefault();
+            var productId = event.currentTarget.id;
+            var quantity = event.currentTarget.value;
+            var myUrl="http://localhost:8080/cart/modify-amount"
 
-        var loginData = {
-            productId : input2.value,
-            quantity : input.value
-        }
+            $.ajax({
+                url: myUrl,
+                method:"post",
+                data: {"productId":productId, "quantity":quantity},
+                success : function() {
+                    console.log("SUCCESS: ");
+                    //alert(response);
+                    //window.location.reload(true);
+                    window.location.href = window.location.href;
+                },
+                error : function(e) {
+                    console.log("ERROR: ", e);
+                    //display(e);
+                },
+                done : function(e) {
+                    console.log("DONE");
+                }
+            });
 
-        //var myUrl="http://localhost:8080/cart/modify-amount?productId="+productId+"&quantity="+quantity
-        var myUrl="http://localhost:8080/cart/modify-amount"
-
-        $.ajax({
-            url: myUrl,
-            method:"post",
-            data: {"productId":productId, "quantity":quantity},
-            success : function() {
-                console.log("SUCCESS: ");
-                //alert(response);
-                //window.location.reload(true);
-                window.location.href = window.location.href;
-            },
-            error : function(e) {
-                console.log("ERROR: ", e);
-                //display(e);
-            },
-            done : function(e) {
-                console.log("DONE");
-            }
-        });
-
-    }});
-
-        //alert("Enter was pressed was presses:"+myUrl);
-
+        //alert("Enter was pressed was presses:"+event.currentTarget.id);
+    }}
 </script>
 </body>
 </html>

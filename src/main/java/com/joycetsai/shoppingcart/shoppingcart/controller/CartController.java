@@ -19,6 +19,7 @@ public class CartController {
 
     private Cart cart;
     private ProductService productService;
+    //private String  modifyId;
 
 
     public CartController(ProductService theProductService) {
@@ -40,7 +41,6 @@ public class CartController {
     @GetMapping("/add")
     public String showListAfterAdd(Model theModel){
         theModel.addAttribute("theCart",cart);
-
         return "cart-list";
     }
 
@@ -69,25 +69,6 @@ public class CartController {
         return "cart-list";
     }
 
-
-//    @GetMapping("/modify-amount")
-//    public  String modifyAmount(@RequestParam("productId") Integer productId ,
-//                                @RequestParam("quantity") Integer quantity,
-//                               RedirectAttributes attributes,
-//                                Model theModel
-//                                ){
-//
-//
-//        Product product = productService.findById(productId);
-//        this.cart.modifyQuantity(product,quantity);
-//
-//        attributes.addFlashAttribute("theCart",cart);
-//
-//        //theModel.addAttribute("theCart",cart);
-//
-//        return "redirect:/cart/list";
-//    }
-
     @PostMapping("/modify-amount")
     public String modifyAmount(@RequestParam("productId") int productId ,
                                @RequestParam("quantity") int quantity){
@@ -96,10 +77,7 @@ public class CartController {
         Product product = productService.findById(productId);
         this.cart.modifyQuantity(product, quantity);
 
-
-        //attributes.addFlashAttribute("theCart", cart);
-
-        //theModel.addAttribute("theCart", cart);
+        //modifyId = String.format("%d",productId);
 
         return "redirect:/cart/modify-amount";
 
@@ -110,6 +88,10 @@ public class CartController {
 
         try {
             theModel.addAttribute("theCart", cart);
+//            String str = "modifyQuantity";
+//            String strId = str.concat(modifyId);
+//            theModel.addAttribute()
+
         }catch (Exception e){
             e.printStackTrace();
         }

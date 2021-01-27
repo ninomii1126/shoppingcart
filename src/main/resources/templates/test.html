@@ -9,6 +9,10 @@
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 </style>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
 <body class="w3-light-grey">
 
 <!-- Top container -->
@@ -58,68 +62,111 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         -->
     </header>
 
+
+
+
 <!-- Overlay effect when opening sidebar on small screens -->
 <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
-<div class="container">
-    <h3>Product directory</h3>
+
+    <h2>My shopping cart</h2>
     <hr>
 
-    <table class="w3-table w3-striped w3-white">
-        <thead class="thead-dark">
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Add to cart</th>
-        </tr>
-        </thead>
+    <div class="container">
 
-        <tbody>
-        <tr th:each="tempProduct:${products}">
+        <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+            <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Desc</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
 
-            <td th:text="${tempProduct.name}" />
+            <tbody>
 
-            <td th:text="${tempProduct.desc}" />
-            <td th:text="${tempProduct.category}" />
-            <td th:text="${tempProduct.price}" />
+            <tr th:each="tempItem:${theCart.items}">
 
-            <!-- add purchase button -->
-            <td>
-                <!--
-                <a th:href="@{/cart/add(productId=${tempProduct.id})}"
-                   class="btn btn-info btn-sm" >
-                    Add to cart
-                </a>
-                -->
-                <form  action="#" th:action="@{/cart/add}"
-                       th:object="${tempProduct.id}" method="POST">
-                    <input type="hidden" th:value="${tempProduct.id}" name="productId"/>
+                <td th:text="${tempItem.value.product.name}"/>
+                <td th:text="${tempItem.value.product.desc}"/>
+                <td th:text="${tempItem.value.product.price}"/>
+                <td>
+                    <input id="modifyId" type="hidden" th:value="${tempItem.value.product.id}"/>
+                    <input id="inputQuantity" type="text" th:value="${tempItem.value.quantity}"/>
+                </td>
+                <td th:text="${tempItem.value.itemPrice}"/>
+                <!-- add delete button -->
+                <td>
+                    <a th:href="@{/cart/delete(productId=${tempItem.value.product.id})}"
+                       class="btn-danger btn-sm">
+                        Delete
+                    </a>
+                </td>
+            </tr>
 
-                    <button class="btn btn-info btn-sm" type="submit">
-                        Add to cart
-                    </button>
-                </form>
+            </tbody>
+
+        </table>
+    </div>
+
+    <hr>
+
+    <p th:text="'Total Price is: ' + ${theCart.totalPrice}"/>
+    <br>
+    <a th:href="@{/cart/clear}" class="w3-button w3-dark-grey">Clear the cart</a>
+    &nbsp;&nbsp;
+    <a th:href="@{/product/list}" class="w3-button w3-dark-grey">Back to product list
+        <i class="fa fa-arrow-right"></i>
+    </a>
+
+    <script th:inline="javascript" >
+    var input = document.getElementById("inputQuantity");
+    var input2 = document.getElementById("modifyId");
+    input.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+        event.preventDefault();
+        var quantity = input.value;
+        var productId= input2.value;
+
+        var loginData = {
+            productId : input2.value,
+            quantity : input.value
+        }
+
+        //var myUrl="http://localhost:8080/cart/modify-amount?productId="+productId+"&quantity="+quantity
+        var myUrl="http://localhost:8080/cart/modify-amount"
+
+        $.ajax({
+            url: myUrl,
+            method:"post",
+            data: {"productId":productId, "quantity":quantity},
+            success : function() {
+                console.log("SUCCESS: ");
+                //alert(response);
+                //window.location.reload(true);
+                window.location.href = window.location.href;
+            },
+            error : function(e) {
+                console.log("ERROR: ", e);
+                //display(e);
+            },
+            done : function(e) {
+                console.log("DONE");
+            }
+        });
+
+    }});
+
+        //alert("Enter was pressed was presses:"+myUrl);
+
+</script>
 
 
 
-            </td>
-        </tr>
-        </tbody>
 
-    </table>
-</div>
-
-
-
-
-
-    <!-- Footer -->
-    <footer class="w3-container w3-padding-16 w3-light-grey">
-        <h4>FOOTER</h4>
-        <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
-    </footer>
 
     <!-- End page content -->
 </div>
