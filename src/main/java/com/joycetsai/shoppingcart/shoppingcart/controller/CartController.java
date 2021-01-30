@@ -71,7 +71,7 @@ public class CartController {
 
     @PostMapping("/modify-amount")
     public String modifyAmount(@RequestParam("productId") int productId ,
-                               @RequestParam("quantity") int quantity){
+                               @RequestParam("quantity") int quantity) throws IOException{
 
 
         Product product = productService.findById(productId);
@@ -79,7 +79,7 @@ public class CartController {
 
         //modifyId = String.format("%d",productId);
 
-        return "redirect:/cart/modify-amount";
+        return "redirect:/modify-amount";
 
     }
 

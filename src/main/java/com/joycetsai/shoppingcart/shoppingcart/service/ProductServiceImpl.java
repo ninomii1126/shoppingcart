@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
@@ -28,11 +28,11 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public Product findById(int id) {
         Optional<Product> result = productRepository.findById(id);
-        Product product=null;
+        Product product = null;
 
-        if(result.isPresent()){
-            product=result.get();
-        }else {
+        if (result.isPresent()) {
+            product = result.get();
+        } else {
             throw new RuntimeException("Can't find product ID: " + id);
         }
         return product;
@@ -43,7 +43,7 @@ public class ProductServiceImpl implements ProductService{
 
         List<Product> products = new ArrayList<Product>();
 
-        products=productRepository.findByProductName(searchName);
+        products = productRepository.findByProductName(searchName);
 
         return products;
     }
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService{
     public Page<Product> findPaginated(Pageable pageable, List<Product> theProducts) {
 
         List<Product> products = new ArrayList<>();
-        products=theProducts;
+        products = theProducts;
         List<Product> list;
 
         int pageSize = pageable.getPageSize();
@@ -71,5 +71,32 @@ public class ProductServiceImpl implements ProductService{
                 = new PageImpl<Product>(list, PageRequest.of(currentPage, pageSize), products.size());
 
         return bookPage;
+    }
+
+    @Override
+    public List<String> getCategories() {
+
+        List<String> categories = productRepository.getCategories();
+
+        return categories;
+    }
+
+    @Override
+    public List<Product> findProductByCategory(String categoryName) {
+
+        List<Product> products = new ArrayList<Product>();
+
+        products = productRepository.findProductByCategory(categoryName);
+
+        return products;
+    }
+
+    @Override
+    public List<Product> searchProductByCategory(String categoryName, String theSearchName) {
+        List<Product> products = new ArrayList<Product>();
+
+        products = productRepository.searchProductByCategory(categoryName,theSearchName);
+
+        return products;
     }
 }

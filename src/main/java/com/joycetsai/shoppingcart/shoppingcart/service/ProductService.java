@@ -12,4 +12,7 @@ public interface ProductService {
     public Product findById(int id);
     public List<Product> search(String searchName);
     public Page<Product> findPaginated(Pageable pageable,List<Product> theProducts);
+    public List<String> getCategories();
+    List<Product> findProductByCategory(String categoryName);
+    List<Product> searchProductByCategory(String categoryName,String theSearchName);
 }
