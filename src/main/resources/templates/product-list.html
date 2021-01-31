@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html  lang="en" xmlns:th="http://www.thymeleaf.org">
+<html  lang="en" xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <title>Product list</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 </style>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
 <body class="w3-light-grey">
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
-    <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+    <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
     <span class="w3-bar-item w3-right">Welcome to online shopping website</span>
 </div>
 
@@ -21,13 +24,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
     <div class="w3-container w3-row">
         <div class="w3-col s4">
-            <img src="/w3images/avatar2.png" class="w3-circle w3-margin-right" style="width:46px">
+
         </div>
         <div class="w3-col s8 w3-bar">
-            <span>Welcome, <strong>Mike</strong></span><br>
-            <a href="#" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i></a>
-            <a href="#" class="w3-bar-item w3-button"><i class="fa fa-user"></i></a>
-            <a href="#" class="w3-bar-item w3-button"><i class="fa fa-cog"></i></a>
+
+            <!--get current user name-->
+            <div sec:authorize="isAuthenticated()">
+                <span>Welcome, </span> <strong><span sec:authentication="name"></span></strong>
+            </div>
         </div>
     </div>
     <hr>
@@ -35,14 +39,19 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <h5>Dashboard</h5>
     </div>
     <div class="w3-bar-block">
-        <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-users fa-fw"></i>  Overview</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>  Views</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>  Traffic</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bullseye fa-fw"></i>  Geo</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i>  Orders</a>
-        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-cog fa-fw"></i>  Settings</a><br><br>
+        <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+
+        <!--cart list-->
+        <a th:href="@{/cart/list}" class="w3-bar-item w3-button w3-padding" onclick="checkCartEmpty()">
+            <i class="fa fa-eye fa-fw"></i>My Cart</a>
+        <!--orders list-->
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i>  Orders</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-cog fa-fw"></i>  Settings</a><br><br>
     </div>
+    <!-- Add a logout button -->
+    <form action="#" th:action="@{/logout}" method="POST">
+        <input type="submit" value="Logout"  />
+    </form>
 </nav>
 
 <!-- !PAGE CONTENT! -->
@@ -61,6 +70,21 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <input type="text" name="theSearchName" id="search" th:value="${theSearchName}"/>
         <input type="submit" value="Search"/>
     </form>
+
+    <!-- product filter(by categories) -->
+    <p>Category filter:</p>
+    <select id="mySelect" onchange="selectedValue(this)">
+        <th:block th:each="tempCategory : ${categories}">
+            <option th:text="${tempCategory}" id="selectedCategory" th:value="${tempCategory}"/>
+        </th:block>
+    </select>
+    <!--
+    <select th:field="*{category}">
+        <option th:each="i : ${#tempProduct.category(0, 100)}" th:value="${i}" th:text="${i}"
+                th:selected="${i==75}"></option>
+                 th:selected="(${selectedCategoryName}==${tempCategory}) ? '' : 'selected'"
+    </select>
+    -->
 
 
     <!-- Overlay effect when opening sidebar on small screens -->
@@ -83,8 +107,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
             <tbody>
             <tr th:each="tempProduct, iStat : ${productPage.content}"
-            th:style="${iStat.odd}? 'font-weight: bold;'"
-            th:alt-title="${iStat.even}? 'even' : 'odd'">
+                th:style="${iStat.odd}? 'font-weight: bold;'"
+                th:alt-title="${iStat.even}? 'even' : 'odd'">
 
                 <td th:text="${tempProduct.name}" />
 
@@ -132,7 +156,41 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     <!-- End page content -->
 </div>
 
+<!-- set default category-->
+<script th:inline="javascript">
+var temp = "a";
+var mySelect = document.getElementById('mySelect');
 
+for(var i, j = 0; i = mySelect.options[j]; j++) {
+    if(i.value == [[${selectedCategoryName}]]) {
+        mySelect.selectedIndex = j;
+        break;
+    }
+}
+</script>
+
+<script>
+    var select = document.getElementById('select');
+    function selectedValue(sel){
+        var str = sel.options[sel.selectedIndex].text;
+        if(str != "" && select==null){
+            //alert("selected cate.: "+str);
+            var myUrl="http://localhost:8080/product/list/"+str;
+
+          window.location.replace(myUrl);
+        }
+    }
+</script>
+
+<script>
+// When the user clicks on <div>, open the popup
+function checkCartEmpty() {
+  //var popup = document.getElementById("myPopup");
+  //if([[${selectedCategoryName}]]==null){
+    popup.classList.toggle("The cart is Empty!");
+  //}
+}
+</script>
 
 <script>
 // Get the Sidebar

@@ -57,6 +57,9 @@ public class CartController {
     @GetMapping("/list")
     public String listCartItems(Model theModel){
 
+        if(cart==null){
+            cart = new Cart();
+        }
         theModel.addAttribute("theCart",this.cart);
         return "cart-list";
     }

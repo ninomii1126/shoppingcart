@@ -72,4 +72,33 @@ public class ProductServiceImpl implements ProductService{
 
         return bookPage;
     }
+
+    @Override
+    public List<String> getCategories() {
+
+        List<String> categories = productRepository.getCategories();
+
+        return categories;
+    }
+
+    @Override
+    public List<Product> findProductByCategory(String categoryName) {
+
+        List<Product> products = new ArrayList<Product>();
+
+        products = productRepository.findProductByCategory(categoryName);
+
+        return products;
+    }
+
+    @Override
+    public List<Product> searchProductByCategory(String categoryName, String theSearchName) {
+        List<Product> products = new ArrayList<Product>();
+
+        products = productRepository.searchProductByCategory(categoryName,theSearchName);
+
+        return products;
+    }
+
+
 }

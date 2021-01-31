@@ -7,18 +7,25 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/product")
 public class ProductController {
 
     private ProductService productService;
+
+    private List<Product> productsFilteredByCat;
+    private Page<Product> filteredPage;
+    private List<Integer> filteredPageNumbers;
+    private String selectedCategory;
 
     public ProductController(ProductService theProductService) {
         productService = theProductService;
@@ -49,6 +56,9 @@ public class ProductController {
         }
 
         theModel.addAttribute("products", theProducts);
+        List<String> theCategories = productService.getCategories();
+        theCategories.add(0," ");
+        theModel.addAttribute("categories", theCategories);
         return "product-list";
     }
 
@@ -60,7 +70,13 @@ public class ProductController {
 
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(5);
-        List<Product> products = productService.search(searchName);
+        List<Product> products;
+
+        if(searchName != null) {
+            products = productService.search(searchName);
+        }else{
+            products = productService.findAll();
+        }
 
         Page<Product> productPage
                 = productService.findPaginated(PageRequest.of(currentPage - 1, pageSize),products);
@@ -75,11 +91,44 @@ public class ProductController {
             theModel.addAttribute("pageNumbers", pageNumbers);
         }
 
-
-
+        List<String> theCategories = productService.getCategories();
+        theCategories.add(0," ");
+        theModel.addAttribute("categories", theCategories);
         theModel.addAttribute("products",products);
 
         return "product-list";
+    }
+
+    @GetMapping("list/{categoryName}")
+    public String categoryFilter(@PathVariable String categoryName,
+                                 Model theModel,
+                                 @RequestParam("page") Optional<Integer> page,
+                                 @RequestParam("size") Optional<Integer> size){
+
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(5);
+        productsFilteredByCat = productService.findProductByCategory(categoryName);
+
+        filteredPage
+                = productService.findPaginated(PageRequest.of(currentPage - 1, pageSize),productsFilteredByCat);
+
+        int totalPages = filteredPage.getTotalPages();
+        if (totalPages > 0) {
+            filteredPageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+
+        }
+        theModel.addAttribute("productPage", this.filteredPage);
+        theModel.addAttribute("pageNumbers", this.filteredPageNumbers);
+        List<String> theCategories = productService.getCategories();
+        theCategories.add(0," ");
+        theModel.addAttribute("categories", theCategories);
+        theModel.addAttribute("selectedCategoryName", categoryName);
+        selectedCategory=categoryName;
+
+        return "product-list";
+
     }
 
 
