@@ -44,8 +44,19 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <!--cart list-->
         <a th:href="@{/cart/list}" class="w3-bar-item w3-button w3-padding" onclick="checkCartEmpty()">
             <i class="fa fa-eye fa-fw"></i>My Cart</a>
+
         <!--orders list-->
-        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i>  Orders</a>
+        <form action="#" th:action="@{/order/list}" method="POST">
+            <input type="hidden" th:value="${#authentication.getPrincipal().getUsername()}" name="username"/>
+
+            <i class="fa fa-diamond fa-fw" style="display: inline"></i>
+            <button class="w3-bar-item w3-button w3-padding" type="submit" style="display: inline">
+                My Orders
+            </button>
+        </form>
+        <!--
+        <a th:href="@{/order/list}" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i>  My Orders</a>
+        -->
         <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-cog fa-fw"></i>  Settings</a><br><br>
     </div>
     <!-- Add a logout button -->
@@ -78,14 +89,6 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             <option th:text="${tempCategory}" id="selectedCategory" th:value="${tempCategory}"/>
         </th:block>
     </select>
-    <!--
-    <select th:field="*{category}">
-        <option th:each="i : ${#tempProduct.category(0, 100)}" th:value="${i}" th:text="${i}"
-                th:selected="${i==75}"></option>
-                 th:selected="(${selectedCategoryName}==${tempCategory}) ? '' : 'selected'"
-    </select>
-    -->
-
 
     <!-- Overlay effect when opening sidebar on small screens -->
     <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay">

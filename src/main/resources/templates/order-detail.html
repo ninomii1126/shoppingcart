@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html  lang="en" xmlns:th="http://www.thymeleaf.org"
        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-<title>Product list</title>
+<title>Order Complete!</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -41,19 +41,13 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     </div>
     <div class="w3-bar-block">
         <a href="#" class="w3-bar-item w3-button w3-padding-16 w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+
         <!--cart list-->
-        <a th:href="@{/cart/list}" class="w3-bar-item w3-button w3-padding" onclick="checkCartEmpty()">My Cart</a>
-
-        <!--order list-->
-        <form action="#" th:action="@{/order/list}" method="POST">
-            <input type="hidden" th:value="${#authentication.getPrincipal().getUsername()}" name="username"/>
-            <button class="w3-bar-item w3-button w3-padding" type="submit" >
-                My Orders
-            </button>
-
-        </form>
-
-        <a href="#" class="w3-bar-item w3-button w3-padding">  Settings</a><br><br>
+        <a th:href="@{/cart/list}" class="w3-bar-item w3-button w3-padding" onclick="checkCartEmpty()">
+            <i class="fa fa-eye fa-fw"></i>My Cart</a>
+        <!--orders list-->
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i> Orders</a>
+        <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-cog fa-fw"></i>  Settings</a><br><br>
     </div>
 </nav>
 
@@ -62,49 +56,45 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
     <!-- Header -->
     <header class="w3-container" style="padding-top:22px">
+        <!--
+        <h5><b><i class="fa fa-dashboard"></i> Product Directory</b></h5>
+        -->
     </header>
+
+
 
 
     <!-- Overlay effect when opening sidebar on small screens -->
     <div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
 
 
-    <h2>My shopping cart</h2>
+    <h2>Order complete!</h2>
     <hr>
+
+    <div sec:authorize="isAuthenticated()">
+         <strong><span sec:authentication="name"></span></strong><span>, here is your order: </span>
+    </div>
 
     <div class="container">
 
-        <table class="w3-table w3-striped w3-bordered w3-border w3-hoverable w3-white">
+        <table class="w3-table w3-striped w3-white">
             <thead class="thead-dark">
             <tr>
-                <th>Name</th>
-                <th>Desc</th>
+                <th>Product</th>
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Subtotal</th>
-                <th>Delete</th>
             </tr>
             </thead>
 
             <tbody>
 
-            <tr th:each="tempItem:${theCart.items}">
+            <tr th:each="tempItem:${theOrder.orderItems}">
 
-                <td th:text="${tempItem.value.product.name}"/>
-                <td th:text="${tempItem.value.product.desc}"/>
-                <td th:text="${tempItem.value.product.price}"/>
-                <td>
-                    <input th:id="${tempItem.value.product.id}" type="text" th:value="${tempItem.value.quantity}"
-                           onkeydown="handle(event)"/>
-                </td>
-                <td th:text="${tempItem.value.itemPrice}"/>
-                <!-- add delete button -->
-                <td>
-                    <a th:href="@{/cart/delete(productId=${tempItem.value.product.id})}"
-                       class="btn-danger btn-sm">
-                        Delete
-                    </a>
-                </td>
+                <td th:text="${tempItem.productName}"/>
+                <td th:text="${tempItem.price}"/>
+                <td th:text="${tempItem.quantity}"/>
+                <td th:text="${tempItem.amount}"/>
             </tr>
 
             </tbody>
@@ -113,66 +103,23 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
     </div>
 
     <hr>
-
+    <!--
+    <p th:text="'Total Price is: ' + ${theCart.totalPrice}"/>
+    -->
     <div style="display:inline">
-    <h4>
-        <b>Total Price is:  </b><b th:text="(${theCart.items}==null) ? 0:${theCart.totalPrice}"/>
-    </h4>
+        <h4>
+            <b>Total Price is:  </b><b th:text="${totalPrice}"/>
+        </h4>
     </div>
     <br>
 
-    <!--check out-->
-    <div sec:authorize="isAuthenticated()">
-    <form  action="#" th:action="@{/cart/create-order}" th:object="${theCart}" method="POST" >
-        <input type="hidden" th:value="${#authentication.getPrincipal().getUsername()}" name="username"/>
-        <button class="w3-button w3-white w3-padding-large w3-hover-black" type="submit" style="display:inline">
-           Check Out
-        </button>
-    </form>
-    </div>
+    <!--
+    <a th:href="@{/order/create}" class="w3-button w3-white w3-padding-large w3-hover-black">Check Out</a>
+    -->
 
-    </hr>
-    <br>
-
-    <a th:href="@{/cart/clear}" class="w3-button w3-dark-grey">Clear the cart</a>
-    &nbsp;&nbsp;
     <a th:href="@{/product/list}" class="w3-button w3-dark-grey">Back to product list
         <i class="fa fa-arrow-right"></i>
     </a>
-    <script th:inline="javascript" >
-        function handle(event) {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            var productId = event.currentTarget.id;
-            var quantity = event.currentTarget.value;
-            var myUrl="http://localhost:8080/cart/modify-amount"
-
-            $.ajax({
-                url: myUrl,
-                method:"post",
-                data: {"productId":productId, "quantity":quantity},
-                success : function() {
-                    console.log("SUCCESS: ");
-                    //alert(response);
-                    window.location.reload(true);
-                    //window.location.href = window.location.href;
-                },
-                error : function(e) {
-                    console.log("ERROR: ", e);
-                    //display(e);
-                },
-                done : function(e) {
-                    console.log("DONE");
-                }
-            });
-
-        //alert("Enter was pressed was presses:"+event.currentTarget.id);
-    }}
-    </script>
-
-
-
-
 
     <!-- End page content -->
 </div>

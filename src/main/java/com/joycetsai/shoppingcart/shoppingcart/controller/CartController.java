@@ -1,16 +1,16 @@
 package com.joycetsai.shoppingcart.shoppingcart.controller;
 
-import com.joycetsai.shoppingcart.shoppingcart.entity.Cart;
-import com.joycetsai.shoppingcart.shoppingcart.entity.Product;
+import com.joycetsai.shoppingcart.shoppingcart.entity.*;
+import com.joycetsai.shoppingcart.shoppingcart.service.OrderService;
 import com.joycetsai.shoppingcart.shoppingcart.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 
 @Controller
@@ -19,11 +19,11 @@ public class CartController {
 
     private Cart cart;
     private ProductService productService;
-    //private String  modifyId;
+    private OrderService orderService;
 
-
-    public CartController(ProductService theProductService) {
+    public CartController(ProductService theProductService, OrderService theOrderService) {
         productService = theProductService;
+        orderService = theOrderService;
     }
 
     @PostMapping("/add")
@@ -59,6 +59,7 @@ public class CartController {
 
         if(cart==null){
             cart = new Cart();
+            cart.setTotalPrice(0.00);
         }
         theModel.addAttribute("theCart",this.cart);
         return "cart-list";
@@ -78,8 +79,11 @@ public class CartController {
 
 
         Product product = productService.findById(productId);
-        this.cart.modifyQuantity(product, quantity);
-
+        if(quantity==0) {
+            cart.deleteItem(product);
+        }else {
+            this.cart.modifyQuantity(product, quantity);
+        }
         //modifyId = String.format("%d",productId);
 
         return "redirect:/cart/modify-amount";
@@ -91,15 +95,41 @@ public class CartController {
 
         try {
             theModel.addAttribute("theCart", cart);
-//            String str = "modifyQuantity";
-//            String strId = str.concat(modifyId);
-//            theModel.addAttribute()
-
         }catch (Exception e){
             e.printStackTrace();
         }
 
         return "cart-list";
+    }
+
+    @PostMapping("/create-order")
+    public String createOrder(@RequestParam("username")String userName,
+                              Model theModel){
+
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        Order order = new Order(userName,(String)(date.format(formatter)),"complete");
+
+        Map<Integer, CartItem> items = cart.getItems();
+
+        for(CartItem tempItem: items.values()){
+
+            OrderItem item
+                    = new OrderItem(tempItem.getProductId(), tempItem.getQuantity(),
+                    tempItem.getProduct().getPrice(), tempItem.getItemPrice());
+
+            item.setProductName((productService.findById(item.getProduct())).getName());
+
+            order.addItem(item);
+        }
+        orderService.save(order);
+        theModel.addAttribute("theOrder",order);
+
+        //total price
+        theModel.addAttribute("totalPrice",cart.getTotalPrice());
+
+        return "order-detail";
     }
 
 

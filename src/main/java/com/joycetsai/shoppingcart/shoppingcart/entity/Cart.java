@@ -31,11 +31,16 @@ public class Cart {
     public double getTotalPrice(){
         double totalPrice =0;
 
-        for(CartItem cartItem:items.values()){
-            totalPrice+=cartItem.getItemPrice();
+        if((items.size()>0)||(items!=null)) {
+            for (CartItem cartItem : items.values()) {
+                totalPrice += cartItem.getItemPrice();
+            }
         }
-
         return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public void clearCart(){
@@ -44,6 +49,10 @@ public class Cart {
 
     public Map<Integer, CartItem> getItems() {
         return items;
+    }
+
+    public void setItems(HashMap<Integer, CartItem> items) {
+        this.items = items;
     }
 
     public void deleteItem(Product product){
@@ -62,11 +71,5 @@ public class Cart {
         items.replace(product.getId(), cartItem);
     }
 
-    @Override
-    public String toString() {
-        return "Cart{" +
-                "items=" + items +
-                ", totalPrice=" + getTotalPrice() +
-                '}';
-    }
+
 }
